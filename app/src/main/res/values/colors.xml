@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- UrbanStyle Modern Palette -->
+    <color name="urban_dark">#1E293B</color>          <!-- Slate Dark -->
+    <color name="urban_dark_surface">#0F172A</color>  <!-- Deep Slate -->
+    <color name="urban_accent">#E65100</color>        <!-- Vibrant Orange/Amber -->
+    <color name="urban_accent_light">#FFF3E0</color>  <!-- Soft Orange Tint -->
+    <color name="urban_red">#DC2626</color>           <!-- Red Alert -->
+    <color name="urban_green">#059669</color>         <!-- Emerald Green -->
+    <color name="urban_green_light">#ECFDF5</color>   <!-- Soft Green Tint -->
+    <color name="urban_bg">#F8FAFC</color>            <!-- Light Slate Background -->
+    <color name="card_bg">#FFFFFF</color>            <!-- Card Background White -->
+
+    <color name="black">#000000</color>
+    <color name="white">#FFFFFF</color>
+    <color name="gray_light">#E2E8F0</color>
+    <color name="gray_text">#64748B</color>
+    <color name="text_dark">#0F172A</color>
+</resources>

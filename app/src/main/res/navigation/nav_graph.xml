@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/homeFragment">
+
+    <fragment
+        android:id="@+id/homeFragment"
+        android:name="pe.edu.cibertec.grupo10.urbanstyle.HomeFragment"
+        android:label="@string/menu_home"
+        tools:layout="@layout/fragment_home" />
+
+    <fragment
+        android:id="@+id/catalogoFragment"
+        android:name="pe.edu.cibertec.grupo10.urbanstyle.CatalogoFragment"
+        android:label="@string/menu_catalogo"
+        tools:layout="@layout/fragment_catalogo" />
+
+    <fragment
+        android:id="@+id/registroVentaFragment"
+        android:name="pe.edu.cibertec.grupo10.urbanstyle.RegistroVentaFragment"
+        android:label="@string/menu_ventas"
+        tools:layout="@layout/fragment_registro_venta" />
+
+    <fragment
+        android:id="@+id/reservasFragment"
+        android:name="pe.edu.cibertec.grupo10.urbanstyle.ReservasFragment"
+        android:label="@string/menu_reservas"
+        tools:layout="@layout/fragment_reservas" />
+
+    <fragment
+        android:id="@+id/syncFragment"
+        android:name="pe.edu.cibertec.grupo10.urbanstyle.SyncFragment"
+        android:label="@string/menu_sync"
+        tools:layout="@layout/fragment_sync" />
+
+</navigation>

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/homeFragment"
+        android:icon="@drawable/outline_home_24"
+        android:title="@string/menu_home" />
+    <item
+        android:id="@+id/catalogoFragment"
+        android:icon="@drawable/outline_inventory_24"
+        android:title="@string/menu_catalogo" />
+    <item
+        android:id="@+id/registroVentaFragment"
+        android:icon="@drawable/outline_point_of_sale_24"
+        android:title="@string/menu_ventas" />
+    <item
+        android:id="@+id/reservasFragment"
+        android:icon="@drawable/outline_bookmark_border_24"
+        android:title="@string/menu_reservas" />
+    <item
+        android:id="@+id/syncFragment"
+        android:icon="@drawable/outline_sync_24"
+        android:title="@string/menu_sync" />
+</menu>

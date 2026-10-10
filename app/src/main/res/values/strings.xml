@@ -1,0 +1,68 @@
+<resources>
+    <string name="app_name">UrbanStyle</string>
+    <string name="title_login">URBANSTYLE</string>
+    <string name="subtitle_login">Sistema Móvil de Gestión de Almacén</string>
+    <string name="hint_dni_usuario">DNI / Usuario</string>
+    <string name="hint_pin_clave">PIN / Clave de Acceso</string>
+    <string name="btn_ingresar">INICIAR SESIÓN</string>
+    <string name="link_soporte">¿Problemas de acceso? Contactar a soporte</string>
+    <string name="text_olvidaste_contrasena">¿Olvidaste tu contraseña?</string>
+    <string name="text_error_login">Usuario o contraseña incorrectos.</string>
+
+    <!-- Alerta -->
+    <string name="title_recuperacion_acceso"> Recuperación de acceso</string>
+    <string name="msg_recuperacion_acceso">Introduce tu correo electrónico, teléfono o nombre de usuario.</string>
+    <string name="btn_entendido">ENTENDIDO</string>
+
+    <!-- Navigation Menu -->
+    <string name="menu_home">Inicio</string>
+    <string name="menu_catalogo">Catálogo</string>
+    <string name="menu_ventas">Ventas</string>
+    <string name="menu_reservas">Reservas</string>
+    <string name="menu_sync">Sincronización</string>
+
+    <!-- Home Fragment -->
+    <string name="title_home">Bienvenido a UrbanStyle</string>
+    <string name="subtitle_home">Panel de Control del Vendedor</string>
+    <string name="desc_home_catalog">Consulta el inventario de prendas disponible en tienda.</string>
+    <string name="desc_home_ventas">Registra ventas offline de forma rápida e intuitiva.</string>
+    <string name="desc_home_reservas">Separa mercadería con adelanto y detalles de envío.</string>
+    <string name="desc_home_sync">Envía los registros guardados hacia el servidor Spring Boot.</string>
+
+    <!-- Fragment Catalogo -->
+    <string name="title_catalogo">Catálogo de Ropa</string>
+    <string name="hint_buscar_producto">Buscar prenda por nombre, color o talla&#8230;</string>
+    <string name="text_stock_actual">Stock Total Disponible: %1$d prendas</string>
+    <string name="btn_ingreso_mercaderia">+ Ingreso de Mercadería</string>
+
+    <!-- Ingreso de Stock -->
+    <string name="title_ingreso_stock">Ingreso de Mercadería</string>
+    <string name="subtitle_ingreso_stock">Registra prendas que llegan del taller de costura</string>
+    <string name="label_prenda_sin_precio">Seleccionar Prenda (Color y Talla):</string>
+    <string name="hint_cantidad_ingreso">Cantidad a Ingresar</string>
+    <string name="btn_registrar_stock">REGISTRAR STOCK</string>
+    <string name="btn_cancelar">Cancelar</string>
+
+    <!-- Fragment Ventas -->
+    <string name="title_registro_venta">Registro de Venta Offline</string>
+    <string name="hint_dni_cliente">DNI del Cliente</string>
+    <string name="hint_nombre_cliente">Nombre Completo del Cliente</string>
+    <string name="hint_direccion_cliente">Dirección de Entrega</string>
+    <string name="label_seleccionar_prenda">Seleccionar Prenda Exacta:</string>
+    <string name="hint_cantidad">Cantidad</string>
+    <string name="label_total_pagar">Total a Pagar: S/ 0.00</string>
+    <string name="btn_registrar_venta">REGISTRAR VENTA OFFLINE</string>
+
+    <!-- Fragment Reservas -->
+    <string name="title_reservas">Reserva de Mercadería</string>
+    <string name="hint_monto_adelanto">Monto de Adelanto (S/)</string>
+    <string name="hint_observaciones">Observaciones (ej. detalles de envío, fecha tentativa)</string>
+    <string name="btn_registrar_reserva">REGISTRAR RESERVA OFFLINE</string>
+
+    <!-- Fragment Sync -->
+    <string name="title_sync">Panel de Sincronización Cloud</string>
+    <string name="btn_sincronizar">SINCRONIZAR DATOS AHORA</string>
+    <string name="text_pendientes_sync">Pendientes de Sincronización: %1$d registros</string>
+    <string name="text_sync_exito">Sincronización completada exitosamente con el backend.</string>
+    <string name="text_sin_pendientes">No hay ventas ni reservas pendientes de envío.</string>
+</resources>
