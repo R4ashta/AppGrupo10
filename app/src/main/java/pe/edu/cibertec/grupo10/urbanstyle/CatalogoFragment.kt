@@ -49,14 +49,14 @@ class CatalogoFragment : Fragment() {
 
         binding.rvProductos.adapter = adapter
 
-        /* Observar productos desde Room Database con LiveData */
+        /* Observar productos */
         val db = UrbanStyleRoomDatabase.getDatabase(requireContext().applicationContext)
         db.productoDao().obtenerTodos().observe(viewLifecycleOwner, Observer { productos ->
             listaProductosActual = productos ?: emptyList()
             adapter.actualizarLista(listaProductosActual)
         })
 
-        /* Observar stock total desde Room Database con LiveData */
+        /* Observar stock */
         db.productoDao().obtenerTotalStock().observe(viewLifecycleOwner, Observer { total ->
             val stockTotal = total ?: 0
             binding.tvStockActual.text = getString(R.string.text_stock_actual, stockTotal)
@@ -69,12 +69,12 @@ class CatalogoFragment : Fragment() {
                 if (filtro.isEmpty()) {
                     adapter.actualizarLista(listaProductosActual)
                 } else {
-                    Thread {
-                        val filtrados = db.productoDao().buscarProductos(filtro)
-                        activity?.runOnUiThread {
-                            adapter.actualizarLista(filtrados)
-                        }
-                    }.start()
+                    val listaFiltrada = listaProductosActual.filter {
+                        it.nombre.contains(filtro, ignoreCase = true) ||
+                        it.color.contains(filtro, ignoreCase = true) ||
+                        it.talla.contains(filtro, ignoreCase = true)
+                    }
+                    adapter.actualizarLista(listaFiltrada)
                 }
             }
 
@@ -94,7 +94,7 @@ class CatalogoFragment : Fragment() {
             val productos = db.productoDao().obtenerTodosSync()
 
             activity?.runOnUiThread {
-                /* Mostrar solo Nombre, Color y Talla (sin precios) */
+                /* Mostrar datos básicos */
                 val itemsPrendas = productos.map { "${it.nombre} (${it.color} - Talla ${it.talla})" }
                 val spinnerAdapter = ArrayAdapter(
                     requireContext(),
@@ -138,7 +138,7 @@ class CatalogoFragment : Fragment() {
                         return@setOnClickListener
                     }
 
-                    /* Aumentar stock en Room Database */
+                    /* Aumentar stock */
                     Thread {
                         db.productoDao().aumentarStock(prod.nombre, cantidad)
                         activity?.runOnUiThread {

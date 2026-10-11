@@ -126,43 +126,12 @@
             android:textSize="15sp"
             android:textStyle="bold"
             app:cornerRadius="12dp"
-            app:layout_constraintBottom_toTopOf="@+id/tvErrorLogin"
+
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/tvOlvidasteClave" />
 
-        <!-- Alerta de Error en pantalla -->
-        <TextView
-            android:id="@+id/tvErrorLogin"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:layout_marginBottom="16dp"
-            android:text="@string/text_error_login"
-            android:textColor="#FF5722"
-            android:textSize="13sp"
-            android:visibility="gone"
-            app:layout_constraintBottom_toTopOf="@+id/tvSoporte"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/btnIngresar"
-            tools:visibility="visible" />
 
-        <!-- Contactar Soporte -->
-        <TextView
-            android:id="@+id/tvSoporte"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:clickable="true"
-            android:focusable="true"
-            android:text="@string/link_soporte"
-            android:textColor="@color/gray_text"
-            android:textSize="13sp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tvErrorLogin" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

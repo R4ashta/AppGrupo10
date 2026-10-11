@@ -42,13 +42,13 @@ class SyncFragment : Fragment() {
 
         val db = UrbanStyleRoomDatabase.getDatabase(requireContext().applicationContext)
 
-        /* Observar todas las ventas/reservas con LiveData */
+        /* Observar registros */
         db.ventaDao().obtenerTodas().observe(viewLifecycleOwner, Observer { lista ->
             val registros = lista ?: emptyList()
             adapter.actualizarLista(registros)
         })
 
-        /* Observar cantidad de pendientes con LiveData */
+        /* Observar pendientes */
         db.ventaDao().obtenerCantidadPendientes().observe(viewLifecycleOwner, Observer { pendientes ->
             val count = pendientes ?: 0
             binding.tvPendientesSync.text = getString(R.string.text_pendientes_sync, count)
@@ -97,7 +97,7 @@ class SyncFragment : Fragment() {
                     )
                 }
 
-                /* Retrofit Call siguiendo el patrón del profesor */
+                /* Llamada Retrofit */
                 val request: Call<VentaResponse> = ClienteRetrofit.retrofitUrbanStyleService.sincronizar(listaRequests)
                 request.enqueue(object : Callback<VentaResponse> {
                     override fun onResponse(
@@ -120,7 +120,7 @@ class SyncFragment : Fragment() {
                     }
 
                     override fun onFailure(call: Call<VentaResponse>, t: Throwable) {
-                        /* Simulación de éxito offline cuando el servidor PHP/SpringBoot no responde */
+                        /* Éxito offline */
                         Thread {
                             db.ventaDao().marcarComoSincronizadoAll()
                             activity?.runOnUiThread {

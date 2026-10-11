@@ -44,7 +44,11 @@ class RegistroVentaFragment : Fragment() {
 
         db.productoDao().obtenerTodos().observe(viewLifecycleOwner, Observer { productos ->
             listaProductos = productos ?: emptyList()
-            val nombresProductos = listaProductos.map { "${it.nombre} (${it.color} - Talla ${it.talla}) - S/ ${it.precio}" }
+            
+            /* Opción por defecto */
+            val nombresProductos = mutableListOf("Selecciona una prenda...")
+            nombresProductos.addAll(listaProductos.map { "${it.nombre} (${it.color} - Talla ${it.talla}) - S/ ${it.precio}" })
+            
             val spinnerAdapter = ArrayAdapter(
                 requireContext(),
                 R.layout.simple_spinner_item,
@@ -56,9 +60,12 @@ class RegistroVentaFragment : Fragment() {
 
         binding.spProductos.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                if (position in listaProductos.indices) {
-                    productoSeleccionado = listaProductos[position]
+                if (position > 0 && position - 1 in listaProductos.indices) {
+                    productoSeleccionado = listaProductos[position - 1]
                     calcularTotal()
+                } else {
+                    productoSeleccionado = null
+                    binding.tvTotalPagar.text = "Total a Pagar: S/ 0.00"
                 }
             }
 
@@ -154,10 +161,11 @@ class RegistroVentaFragment : Fragment() {
                     Toast.LENGTH_LONG
                 ).show()
 
-                /* Limpiar formulario */
+                /* Limpiar datos */
                 binding.etDniCliente.text?.clear()
                 binding.etNombreCliente.text?.clear()
                 binding.etDireccionCliente.text?.clear()
+                binding.spProductos.setSelection(0)
                 binding.etCantidad.setText("1")
             }
         }.start()

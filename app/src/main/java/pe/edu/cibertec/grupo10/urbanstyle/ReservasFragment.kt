@@ -44,7 +44,11 @@ class ReservasFragment : Fragment() {
 
         db.productoDao().obtenerTodos().observe(viewLifecycleOwner, Observer { productos ->
             listaProductos = productos ?: emptyList()
-            val nombresProductos = listaProductos.map { "${it.nombre} (${it.color} - Talla ${it.talla}) - S/ ${it.precio}" }
+            
+            /* Opción por defecto */
+            val nombresProductos = mutableListOf("Selecciona una prenda...")
+            nombresProductos.addAll(listaProductos.map { "${it.nombre} (${it.color} - Talla ${it.talla}) - S/ ${it.precio}" })
+            
             val spinnerAdapter = ArrayAdapter(
                 requireContext(),
                 R.layout.simple_spinner_item,
@@ -56,9 +60,12 @@ class ReservasFragment : Fragment() {
 
         binding.spProductosReserva.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                if (position in listaProductos.indices) {
-                    productoSeleccionado = listaProductos[position]
+                if (position > 0 && position - 1 in listaProductos.indices) {
+                    productoSeleccionado = listaProductos[position - 1]
                     calcularTotal()
+                } else {
+                    productoSeleccionado = null
+                    binding.tvTotalReserva.text = "Total Reserva: S/ 0.00"
                 }
             }
 
@@ -150,10 +157,11 @@ class ReservasFragment : Fragment() {
                     Toast.LENGTH_LONG
                 ).show()
 
-                /* Limpiar formulario */
+                /* Limpiar datos */
                 binding.etDniReserva.text?.clear()
                 binding.etNombreReserva.text?.clear()
                 binding.etDireccionReserva.text?.clear()
+                binding.spProductosReserva.setSelection(0)
                 binding.etMontoAdelanto.text?.clear()
                 binding.etObservaciones.text?.clear()
                 binding.etCantidadReserva.setText("1")

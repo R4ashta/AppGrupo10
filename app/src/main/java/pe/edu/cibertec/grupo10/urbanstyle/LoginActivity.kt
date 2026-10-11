@@ -2,8 +2,6 @@ package pe.edu.cibertec.grupo10.urbanstyle
 
 import android.content.Intent
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
 import android.view.View
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
@@ -23,26 +21,15 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener {
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        /* Ocultar mensaje de error al escribir */
-        val textWatcher = object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                binding.tvErrorLogin.visibility = View.GONE
-            }
-            override fun afterTextChanged(s: Editable?) {}
-        }
-        binding.etUsuario.addTextChangedListener(textWatcher)
-        binding.etClave.addTextChangedListener(textWatcher)
-
         binding.btnIngresar.setOnClickListener(this)
         binding.tvOlvidasteClave.setOnClickListener(this)
-        binding.tvSoporte.setOnClickListener(this)
+
     }
 
     override fun onClick(v: View?) {
         when (v?.id) {
             R.id.btnIngresar -> login()
-            R.id.tvOlvidasteClave, R.id.tvSoporte -> mostrarDialogoRecuperacion()
+
         }
     }
 
@@ -50,19 +37,18 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener {
         val usuario = binding.etUsuario.text.toString().trim()
         val clave = binding.etClave.text.toString().trim()
 
-        /* Verificación de credenciales (Admin o Vendedor activo) */
+        /* Verificar credenciales */
         val credencialValida = (usuario.equals("admin", ignoreCase = true) ||
                 usuario.equals("vendedor", ignoreCase = true) ||
                 usuario == "72819203") && (clave == "1234" || clave == "admin")
 
         if (!credencialValida) {
-            /* Mostrar alerta / mensaje de error exacto en pantalla */
-            binding.tvErrorLogin.visibility = View.VISIBLE
+            /* Mostrar error */
+            mostrarAlertaError()
             return
         }
 
-        /* Credencial correcta: Guardar usuario logueado en Room DB e ingresar */
-        binding.tvErrorLogin.visibility = View.GONE
+        /* Credencial correcta */
         val persona = PersonaEntity(
             id = usuario,
             nombres = "Vendedor",
@@ -84,7 +70,17 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener {
         }.start()
     }
 
-    /* Mostrar Modal de Recuperación de Acceso */
+    /* Mostrar error */
+    private fun mostrarAlertaError() {
+        MaterialAlertDialogBuilder(this)
+            .setMessage(R.string.text_error_login)
+            .setPositiveButton("OK") { dialog, _ ->
+                dialog.dismiss()
+            }
+            .show()
+    }
+
+    /* Mostrar recuperación */
     private fun mostrarDialogoRecuperacion() {
         MaterialAlertDialogBuilder(this)
             .setTitle(R.string.title_recuperacion_acceso)

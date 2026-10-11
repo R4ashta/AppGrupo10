@@ -37,7 +37,7 @@ abstract class UrbanStyleRoomDatabase : RoomDatabase() {
                     .addCallback(object : Callback() {
                         override fun onCreate(db: SupportSQLiteDatabase) {
                             super.onCreate(db)
-                            /* Pre-poblar inventario inicial de UrbanStyle */
+                            /* Inventario inicial */
                             Thread {
                                 val database = getDatabase(context)
                                 database.productoDao().insertarLista(

@@ -26,7 +26,7 @@ class UrbanStyleDbHelper(context: Context) :
         const val COL_PROD_PRECIO = "precio"
         const val COL_PROD_STOCK = "stock"
 
-        /* Tabla Ventas y Reservas (Offline-First) */
+        /* Tabla Ventas y Reservas */
         const val TABLE_VENTA = "ventas"
         const val COL_VENTA_ID = "id"
         const val COL_VENTA_TICKET = "codigo_ticket"
@@ -175,7 +175,7 @@ class UrbanStyleDbHelper(context: Context) :
         db.execSQL(query, arrayOf(cantidad, nombreProducto))
     }
 
-    /* Generador de Código Ticket Único (Ej: V-261005-1234) */
+    /* Generar Ticket */
     fun generarCodigoTicket(prefijo: String): String {
         val fecha = SimpleDateFormat("yyMMdd", Locale.getDefault()).format(Date())
         val aleatorio = (1000..9999).random()
