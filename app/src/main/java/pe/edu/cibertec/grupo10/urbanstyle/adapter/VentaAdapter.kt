@@ -6,11 +6,11 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import pe.edu.cibertec.grupo10.urbanstyle.R
 import pe.edu.cibertec.grupo10.urbanstyle.databinding.ItemVentaBinding
-import pe.edu.cibertec.grupo10.urbanstyle.retrofit.response.VentaSync
+import pe.edu.cibertec.grupo10.urbanstyle.db.entity.VentaEntity
 import java.util.Locale
 
 class VentaAdapter(
-    private var listaVentas: List<VentaSync>
+    private var listaVentas: List<VentaEntity>
 ) : RecyclerView.Adapter<VentaAdapter.VentaViewHolder>() {
 
     class VentaViewHolder(val binding: ItemVentaBinding) :
@@ -51,7 +51,7 @@ class VentaAdapter(
 
     override fun getItemCount(): Int = listaVentas.size
 
-    fun actualizarLista(nuevaLista: List<VentaSync>) {
+    fun actualizarLista(nuevaLista: List<VentaEntity>) {
         listaVentas = nuevaLista
         notifyDataSetChanged()
     }

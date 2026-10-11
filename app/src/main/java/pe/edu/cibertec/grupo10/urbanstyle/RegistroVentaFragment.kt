@@ -11,10 +11,13 @@ import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import pe.edu.cibertec.grupo10.urbanstyle.database.UrbanStyleDbHelper
+import androidx.lifecycle.Observer
 import pe.edu.cibertec.grupo10.urbanstyle.databinding.FragmentRegistroVentaBinding
-import pe.edu.cibertec.grupo10.urbanstyle.retrofit.response.Producto
-import pe.edu.cibertec.grupo10.urbanstyle.retrofit.response.VentaSync
+import pe.edu.cibertec.grupo10.urbanstyle.db.UrbanStyleRoomDatabase
+import pe.edu.cibertec.grupo10.urbanstyle.db.entity.ProductoEntity
+import pe.edu.cibertec.grupo10.urbanstyle.db.entity.VentaEntity
+import java.text.SimpleDateFormat
+import java.util.Date
 import java.util.Locale
 
 class RegistroVentaFragment : Fragment() {
@@ -22,9 +25,8 @@ class RegistroVentaFragment : Fragment() {
     private var _binding: FragmentRegistroVentaBinding? = null
     private val binding get() = _binding!!
 
-    private lateinit var dbHelper: UrbanStyleDbHelper
-    private var listaProductos: List<Producto> = emptyList()
-    private var productoSeleccionado: Producto? = null
+    private var listaProductos: List<ProductoEntity> = emptyList()
+    private var productoSeleccionado: ProductoEntity? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -38,17 +40,19 @@ class RegistroVentaFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        dbHelper = UrbanStyleDbHelper(requireContext())
-        listaProductos = dbHelper.obtenerTodosProductos()
+        val db = UrbanStyleRoomDatabase.getDatabase(requireContext().applicationContext)
 
-        val nombresProductos = listaProductos.map { "${it.nombre} (${it.color} - Talla ${it.talla}) - S/ ${it.precio}" }
-        val spinnerAdapter = ArrayAdapter(
-            requireContext(),
-            R.layout.simple_spinner_item,
-            nombresProductos
-        )
-        spinnerAdapter.setDropDownViewResource(R.layout.simple_spinner_dropdown_item)
-        binding.spProductos.adapter = spinnerAdapter
+        db.productoDao().obtenerTodos().observe(viewLifecycleOwner, Observer { productos ->
+            listaProductos = productos ?: emptyList()
+            val nombresProductos = listaProductos.map { "${it.nombre} (${it.color} - Talla ${it.talla}) - S/ ${it.precio}" }
+            val spinnerAdapter = ArrayAdapter(
+                requireContext(),
+                R.layout.simple_spinner_item,
+                nombresProductos
+            )
+            spinnerAdapter.setDropDownViewResource(R.layout.simple_spinner_dropdown_item)
+            binding.spProductos.adapter = spinnerAdapter
+        })
 
         binding.spProductos.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
@@ -122,35 +126,41 @@ class RegistroVentaFragment : Fragment() {
         }
 
         val total = prod.precio * cantidad
-        val venta = VentaSync(
+        val fecha = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault()).format(Date())
+        val fechaTicket = SimpleDateFormat("yyMMdd", Locale.getDefault()).format(Date())
+        val ticket = "V-$fechaTicket-${(1000..9999).random()}"
+
+        val venta = VentaEntity(
+            codigoTicket = ticket,
             dniCliente = dni,
             nombreCliente = nombre,
             direccion = direccion,
             productoNombre = prod.nombre,
             cantidad = cantidad,
             total = total,
-            tipo = "VENTA"
+            tipo = "VENTA",
+            fecha = fecha
         )
 
-        val exito = dbHelper.registrarVentaOReserva(venta)
-        if (exito) {
-            Toast.makeText(
-                requireContext(),
-                "¡Venta offline registrada correctamente en SQLite!",
-                Toast.LENGTH_LONG
-            ).show()
+        val db = UrbanStyleRoomDatabase.getDatabase(requireContext().applicationContext)
+        Thread {
+            db.ventaDao().insertar(venta)
+            db.productoDao().descontarStock(prod.nombre, cantidad)
 
-            /* Limpiar formulario */
-            binding.etDniCliente.text?.clear()
-            binding.etNombreCliente.text?.clear()
-            binding.etDireccionCliente.text?.clear()
-            binding.etCantidad.setText("1")
+            activity?.runOnUiThread {
+                Toast.makeText(
+                    requireContext(),
+                    "¡Venta offline registrada correctamente en Room!",
+                    Toast.LENGTH_LONG
+                ).show()
 
-            /* Actualizar stock */
-            listaProductos = dbHelper.obtenerTodosProductos()
-        } else {
-            Toast.makeText(requireContext(), "Error al guardar la venta en SQLite", Toast.LENGTH_SHORT).show()
-        }
+                /* Limpiar formulario */
+                binding.etDniCliente.text?.clear()
+                binding.etNombreCliente.text?.clear()
+                binding.etDireccionCliente.text?.clear()
+                binding.etCantidad.setText("1")
+            }
+        }.start()
     }
 
     override fun onDestroyView() {

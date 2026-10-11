@@ -4,15 +4,15 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import pe.edu.cibertec.grupo10.urbanstyle.databinding.ItemProductoBinding
-import pe.edu.cibertec.grupo10.urbanstyle.retrofit.response.Producto
+import pe.edu.cibertec.grupo10.urbanstyle.db.entity.ProductoEntity
 import java.util.Locale
 
 class ProductoAdapter(
-    private var listaProductos: List<Producto>,
-    private val onItemClick: ((Producto) -> Unit)? = null
+    private var listaProductos: List<ProductoEntity>,
+    private val onItemClick: ((ProductoEntity) -> Unit)? = null
 ) : RecyclerView.Adapter<ProductoAdapter.ProductoViewHolder>() {
 
-    inner class ProductoViewHolder(val binding: ItemProductoBinding) :
+    class ProductoViewHolder(val binding: ItemProductoBinding) :
         RecyclerView.ViewHolder(binding.root)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ProductoViewHolder {
@@ -41,7 +41,7 @@ class ProductoAdapter(
 
     override fun getItemCount(): Int = listaProductos.size
 
-    fun actualizarLista(nuevaLista: List<Producto>) {
+    fun actualizarLista(nuevaLista: List<ProductoEntity>) {
         listaProductos = nuevaLista
         notifyDataSetChanged()
     }

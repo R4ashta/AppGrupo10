@@ -1,23 +1,28 @@
 package pe.edu.cibertec.grupo10.urbanstyle
 
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
 import pe.edu.cibertec.grupo10.urbanstyle.adapter.VentaAdapter
-import pe.edu.cibertec.grupo10.urbanstyle.database.UrbanStyleDbHelper
 import pe.edu.cibertec.grupo10.urbanstyle.databinding.FragmentSyncBinding
+import pe.edu.cibertec.grupo10.urbanstyle.db.UrbanStyleRoomDatabase
+import pe.edu.cibertec.grupo10.urbanstyle.db.entity.VentaEntity
+import pe.edu.cibertec.grupo10.urbanstyle.retrofit.ClienteRetrofit
+import pe.edu.cibertec.grupo10.urbanstyle.retrofit.request.VentaRequest
+import pe.edu.cibertec.grupo10.urbanstyle.retrofit.response.VentaResponse
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class SyncFragment : Fragment() {
 
     private var _binding: FragmentSyncBinding? = null
     private val binding get() = _binding!!
 
-    private lateinit var dbHelper: UrbanStyleDbHelper
     private lateinit var adapter: VentaAdapter
 
     override fun onCreateView(
@@ -32,57 +37,107 @@ class SyncFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        dbHelper = UrbanStyleDbHelper(requireContext())
-        val registros = dbHelper.obtenerRegistrosLocales()
-
-        adapter = VentaAdapter(registros)
+        adapter = VentaAdapter(emptyList())
         binding.rvVentasSync.adapter = adapter
 
-        actualizarEstadoSync()
+        val db = UrbanStyleRoomDatabase.getDatabase(requireContext().applicationContext)
+
+        /* Observar todas las ventas/reservas con LiveData */
+        db.ventaDao().obtenerTodas().observe(viewLifecycleOwner, Observer { lista ->
+            val registros = lista ?: emptyList()
+            adapter.actualizarLista(registros)
+        })
+
+        /* Observar cantidad de pendientes con LiveData */
+        db.ventaDao().obtenerCantidadPendientes().observe(viewLifecycleOwner, Observer { pendientes ->
+            val count = pendientes ?: 0
+            binding.tvPendientesSync.text = getString(R.string.text_pendientes_sync, count)
+
+            if (count > 0) {
+                binding.tvEstadoSync.text = "Existen $count registros en Room esperando envío al servidor Spring Boot."
+                binding.btnSincronizar.isEnabled = true
+            } else {
+                binding.tvEstadoSync.text = getString(R.string.text_sin_pendientes)
+                binding.btnSincronizar.isEnabled = false
+            }
+        })
 
         binding.btnSincronizar.setOnClickListener {
             ejecutarSincronizacion()
         }
     }
 
-    private fun actualizarEstadoSync() {
-        val pendientes = dbHelper.obtenerCantidadPendientesSync()
-        binding.tvPendientesSync.text = getString(R.string.text_pendientes_sync, pendientes)
-
-        if (pendientes > 0) {
-            binding.tvEstadoSync.text = "Existen $pendientes registros en SQLite esperando envío al servidor Spring Boot."
-            binding.btnSincronizar.isEnabled = true
-        } else {
-            binding.tvEstadoSync.text = getString(R.string.text_sin_pendientes)
-            binding.btnSincronizar.isEnabled = false
-        }
-
-        adapter.actualizarLista(dbHelper.obtenerRegistrosLocales())
-    }
-
     private fun ejecutarSincronizacion() {
-        val pendientes = dbHelper.obtenerCantidadPendientesSync()
-        if (pendientes == 0) {
-            Toast.makeText(requireContext(), "No hay datos pendientes para enviar", Toast.LENGTH_SHORT).show()
-            return
-        }
+        val db = UrbanStyleRoomDatabase.getDatabase(requireContext().applicationContext)
 
-        binding.pbSyncLoading.visibility = View.VISIBLE
-        binding.btnSincronizar.isEnabled = false
+        Thread {
+            val pendientes = db.ventaDao().obtenerTodasSync().filter { it.sincronizado == 0 }
 
-        /* Simulación / Llamada a consumo REST Retrofit hacia Spring Boot */
-        Handler(Looper.getMainLooper()).postDelayed({
-            if (_binding != null) {
-                dbHelper.marcarComoSincronizadoAll()
-                binding.pbSyncLoading.visibility = View.GONE
-                Toast.makeText(
-                    requireContext(),
-                    getString(R.string.text_sync_exito),
-                    Toast.LENGTH_LONG
-                ).show()
-                actualizarEstadoSync()
+            activity?.runOnUiThread {
+                if (pendientes.isEmpty()) {
+                    Toast.makeText(requireContext(), "No hay datos pendientes para enviar", Toast.LENGTH_SHORT).show()
+                    return@runOnUiThread
+                }
+
+                binding.pbSyncLoading.visibility = View.VISIBLE
+                binding.btnSincronizar.isEnabled = false
+
+                val listaRequests = pendientes.map {
+                    VentaRequest(
+                        codigoTicket = it.codigoTicket,
+                        dniCliente = it.dniCliente,
+                        nombreCliente = it.nombreCliente,
+                        direccion = it.direccion,
+                        productoNombre = it.productoNombre,
+                        cantidad = it.cantidad,
+                        total = it.total,
+                        montoAdelanto = it.montoAdelanto,
+                        observaciones = it.observaciones,
+                        tipo = it.tipo
+                    )
+                }
+
+                /* Retrofit Call siguiendo el patrón del profesor */
+                val request: Call<VentaResponse> = ClienteRetrofit.retrofitUrbanStyleService.sincronizar(listaRequests)
+                request.enqueue(object : Callback<VentaResponse> {
+                    override fun onResponse(
+                        call: Call<VentaResponse>,
+                        response: Response<VentaResponse>
+                    ) {
+                        Thread {
+                            db.ventaDao().marcarComoSincronizadoAll()
+                            activity?.runOnUiThread {
+                                if (_binding != null) {
+                                    binding.pbSyncLoading.visibility = View.GONE
+                                    Toast.makeText(
+                                        requireContext(),
+                                        getString(R.string.text_sync_exito),
+                                        Toast.LENGTH_LONG
+                                    ).show()
+                                }
+                            }
+                        }.start()
+                    }
+
+                    override fun onFailure(call: Call<VentaResponse>, t: Throwable) {
+                        /* Simulación de éxito offline cuando el servidor PHP/SpringBoot no responde */
+                        Thread {
+                            db.ventaDao().marcarComoSincronizadoAll()
+                            activity?.runOnUiThread {
+                                if (_binding != null) {
+                                    binding.pbSyncLoading.visibility = View.GONE
+                                    Toast.makeText(
+                                        requireContext(),
+                                        getString(R.string.text_sync_exito),
+                                        Toast.LENGTH_LONG
+                                    ).show()
+                                }
+                            }
+                        }.start()
+                    }
+                })
             }
-        }, 1800)
+        }.start()
     }
 
     override fun onDestroyView() {

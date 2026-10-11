@@ -11,20 +11,21 @@ import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import pe.edu.cibertec.grupo10.urbanstyle.adapter.ProductoAdapter
-import pe.edu.cibertec.grupo10.urbanstyle.database.UrbanStyleDbHelper
 import pe.edu.cibertec.grupo10.urbanstyle.databinding.DialogIngresoStockBinding
 import pe.edu.cibertec.grupo10.urbanstyle.databinding.FragmentCatalogoBinding
-import pe.edu.cibertec.grupo10.urbanstyle.retrofit.response.Producto
+import pe.edu.cibertec.grupo10.urbanstyle.db.UrbanStyleRoomDatabase
+import pe.edu.cibertec.grupo10.urbanstyle.db.entity.ProductoEntity
 
 class CatalogoFragment : Fragment() {
 
     private var _binding: FragmentCatalogoBinding? = null
     private val binding get() = _binding!!
 
-    private lateinit var dbHelper: UrbanStyleDbHelper
     private lateinit var adapter: ProductoAdapter
+    private var listaProductosActual: List<ProductoEntity> = emptyList()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -38,10 +39,7 @@ class CatalogoFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        dbHelper = UrbanStyleDbHelper(requireContext())
-        val listaInicial = dbHelper.obtenerTodosProductos()
-
-        adapter = ProductoAdapter(listaInicial) { producto ->
+        adapter = ProductoAdapter(emptyList()) { producto ->
             Toast.makeText(
                 requireContext(),
                 "Seleccionado: ${producto.nombre} - Stock: ${producto.stock} ud.",
@@ -50,18 +48,34 @@ class CatalogoFragment : Fragment() {
         }
 
         binding.rvProductos.adapter = adapter
-        actualizarResumenStock()
+
+        /* Observar productos desde Room Database con LiveData */
+        val db = UrbanStyleRoomDatabase.getDatabase(requireContext().applicationContext)
+        db.productoDao().obtenerTodos().observe(viewLifecycleOwner, Observer { productos ->
+            listaProductosActual = productos ?: emptyList()
+            adapter.actualizarLista(listaProductosActual)
+        })
+
+        /* Observar stock total desde Room Database con LiveData */
+        db.productoDao().obtenerTotalStock().observe(viewLifecycleOwner, Observer { total ->
+            val stockTotal = total ?: 0
+            binding.tvStockActual.text = getString(R.string.text_stock_actual, stockTotal)
+        })
 
         binding.etBuscarProducto.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 val filtro = s?.toString()?.trim() ?: ""
-                val listaFiltrada = if (filtro.isEmpty()) {
-                    dbHelper.obtenerTodosProductos()
+                if (filtro.isEmpty()) {
+                    adapter.actualizarLista(listaProductosActual)
                 } else {
-                    dbHelper.buscarProductos(filtro)
+                    Thread {
+                        val filtrados = db.productoDao().buscarProductos(filtro)
+                        activity?.runOnUiThread {
+                            adapter.actualizarLista(filtrados)
+                        }
+                    }.start()
                 }
-                adapter.actualizarLista(listaFiltrada)
             }
 
             override fun afterTextChanged(s: Editable?) {}
@@ -74,76 +88,73 @@ class CatalogoFragment : Fragment() {
 
     private fun mostrarDialogoIngresoStock() {
         val dialogBinding = DialogIngresoStockBinding.inflate(layoutInflater)
-        val productos = dbHelper.obtenerTodosProductos()
+        val db = UrbanStyleRoomDatabase.getDatabase(requireContext().applicationContext)
 
-        /* Mostrar solo Nombre, Color y Talla*/
+        Thread {
+            val productos = db.productoDao().obtenerTodosSync()
 
-        val itemsPrendas = productos.map { "${it.nombre} (${it.color} - Talla ${it.talla})" }
-        val spinnerAdapter = ArrayAdapter(
-            requireContext(),
-            android.R.layout.simple_spinner_item,
-            itemsPrendas
-        )
-        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        dialogBinding.spProductosIngreso.adapter = spinnerAdapter
+            activity?.runOnUiThread {
+                /* Mostrar solo Nombre, Color y Talla (sin precios) */
+                val itemsPrendas = productos.map { "${it.nombre} (${it.color} - Talla ${it.talla})" }
+                val spinnerAdapter = ArrayAdapter(
+                    requireContext(),
+                    android.R.layout.simple_spinner_item,
+                    itemsPrendas
+                )
+                spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                dialogBinding.spProductosIngreso.adapter = spinnerAdapter
 
-        var productoSeleccionado: Producto? = if (productos.isNotEmpty()) productos[0] else null
+                var productoSeleccionado: ProductoEntity? = if (productos.isNotEmpty()) productos[0] else null
 
-        dialogBinding.spProductosIngreso.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                if (position in productos.indices) {
-                    productoSeleccionado = productos[position]
+                dialogBinding.spProductosIngreso.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+                    override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                        if (position in productos.indices) {
+                            productoSeleccionado = productos[position]
+                        }
+                    }
+                    override fun onNothingSelected(parent: AdapterView<*>?) {}
                 }
+
+                val dialog: AlertDialog = MaterialAlertDialogBuilder(requireContext())
+                    .setView(dialogBinding.root)
+                    .create()
+
+                dialogBinding.btnCancelarIngreso.setOnClickListener {
+                    dialog.dismiss()
+                }
+
+                dialogBinding.btnGuardarIngreso.setOnClickListener {
+                    val prod = productoSeleccionado
+                    val cantStr = dialogBinding.etCantidadIngreso.text.toString().trim()
+                    val cantidad = cantStr.toIntOrNull() ?: 0
+
+                    if (prod == null) {
+                        Toast.makeText(requireContext(), "Seleccione una prenda", Toast.LENGTH_SHORT).show()
+                        return@setOnClickListener
+                    }
+
+                    if (cantidad <= 0) {
+                        dialogBinding.etCantidadIngreso.error = "Ingrese una cantidad válida mayor a 0"
+                        return@setOnClickListener
+                    }
+
+                    /* Aumentar stock en Room Database */
+                    Thread {
+                        db.productoDao().aumentarStock(prod.nombre, cantidad)
+                        activity?.runOnUiThread {
+                            Toast.makeText(
+                                requireContext(),
+                                "¡Ingreso registrado! +$cantidad ud. a ${prod.nombre}",
+                                Toast.LENGTH_LONG
+                            ).show()
+                            dialog.dismiss()
+                        }
+                    }.start()
+                }
+
+                dialog.show()
             }
-            override fun onNothingSelected(parent: AdapterView<*>?) {}
-        }
-
-        val dialog: AlertDialog = MaterialAlertDialogBuilder(requireContext())
-            .setView(dialogBinding.root)
-            .create()
-
-        dialogBinding.btnCancelarIngreso.setOnClickListener {
-            dialog.dismiss()
-        }
-
-        dialogBinding.btnGuardarIngreso.setOnClickListener {
-            val prod = productoSeleccionado
-            val cantStr = dialogBinding.etCantidadIngreso.text.toString().trim()
-            val cantidad = cantStr.toIntOrNull() ?: 0
-
-            if (prod == null) {
-                Toast.makeText(requireContext(), "Seleccione una prenda", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-
-            if (cantidad <= 0) {
-                dialogBinding.etCantidadIngreso.error = "Ingrese una cantidad válida mayor a 0"
-                return@setOnClickListener
-            }
-
-            /* Aumentar stock en SQLite */
-            dbHelper.aumentarStock(prod.nombre, cantidad)
-
-            Toast.makeText(
-                requireContext(),
-                "¡Ingreso registrado! +$cantidad ud. a ${prod.nombre}",
-                Toast.LENGTH_LONG
-            ).show()
-
-            dialog.dismiss()
-
-            /*Refrescar lista y stock*/
-            val nuevaLista = dbHelper.obtenerTodosProductos()
-            adapter.actualizarLista(nuevaLista)
-            actualizarResumenStock()
-        }
-
-        dialog.show()
-    }
-
-    private fun actualizarResumenStock() {
-        val totalStock = dbHelper.obtenerTotalStock()
-        binding.tvStockActual.text = getString(R.string.text_stock_actual, totalStock)
+        }.start()
     }
 
     override fun onDestroyView() {

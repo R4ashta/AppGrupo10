@@ -1,5 +1,6 @@
 plugins {
     alias(libs.plugins.android.application)
+    alias(libs.plugins.ksp)
 }
 
 android {
@@ -38,14 +39,18 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.material)
 
-    // Navigation Component
+    /* Navigation Component */
     implementation(libs.androidx.navigation.fragment.ktx)
     implementation(libs.androidx.navigation.ui.ktx)
 
-    // Retrofit & Gson
-    implementation(libs.retrofit)
-    implementation(libs.retrofit.converter.gson)
-    implementation(libs.gson)
+    /* Retrofit & Gson */
+    implementation("com.squareup.retrofit2:retrofit:3.0.0")
+    implementation("com.squareup.retrofit2:converter-gson:3.0.0")
+
+    /* ROOM Database */
+    implementation("androidx.room:room-runtime:2.8.4")
+    ksp("androidx.room:room-compiler:2.8.4")
+    implementation("androidx.room:room-ktx:2.8.4")
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.espresso.core)
