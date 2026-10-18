@@ -67,4 +67,13 @@
     <string name="text_sin_pendientes">No hay ventas ni reservas pendientes de envío.</string>
 
     <string name="title_registros_locales">Registros Locales (Ventas y Reservas)</string>
+    <string name="home_accesos_rapidos">Accesos rápidos</string>
+    <string name="catalogo_sin_resultados">No encontramos prendas con esa búsqueda.</string>
+    <string name="catalogo_vacio">Todavía no hay prendas en el catálogo.</string>
+    <string name="catalogo_ordenar">Ordenar por</string>
+    <string-array name="catalogo_opciones_orden">
+        <item>Nombre A–Z</item>
+        <item>Menor precio</item>
+        <item>Mayor precio</item>
+    </string-array>
 </resources>

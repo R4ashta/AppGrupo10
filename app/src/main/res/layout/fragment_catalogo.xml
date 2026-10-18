@@ -6,6 +6,7 @@
     android:layout_height="match_parent"
     android:background="@color/urban_bg"
     android:padding="16dp"
+    android:paddingTop="32dp"
     tools:context=".CatalogoFragment">
 
     <TextView
@@ -16,14 +17,15 @@
         android:textColor="@color/text_dark"
         android:textSize="22sp"
         android:textStyle="bold"
-        app:layout_constraintEnd_toStartOf="@+id/btnIngresarStock"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <Button
         android:id="@+id/btnIngresarStock"
         android:layout_width="wrap_content"
-        android:layout_height="40dp"
+        android:layout_height="wrap_content"
+        android:minHeight="48dp"
         android:backgroundTint="@color/urban_green"
         android:paddingHorizontal="12dp"
         android:text="@string/btn_ingreso_mercaderia"
@@ -31,9 +33,9 @@
         android:textSize="12sp"
         android:textStyle="bold"
         app:cornerRadius="6dp"
-        app:layout_constraintBottom_toBottomOf="@+id/tvTituloCatalogo"
+        android:layout_marginTop="8dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/tvTituloCatalogo" />
+        app:layout_constraintTop_toBottomOf="@+id/tvTituloCatalogo" />
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/tilBuscar"
@@ -43,10 +45,11 @@
         android:layout_marginTop="12dp"
         android:hint="@string/hint_buscar_producto"
         app:boxBackgroundColor="@color/white"
+        app:endIconMode="clear_text"
         app:startIconDrawable="@drawable/outline_inventory_24"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvTituloCatalogo">
+        app:layout_constraintTop_toBottomOf="@+id/btnIngresarStock">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/etBuscarProducto"
@@ -80,6 +83,36 @@
             android:textStyle="bold" />
     </com.google.android.material.card.MaterialCardView>
 
+    <LinearLayout
+        android:id="@+id/filaOrdenCatalogo"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        app:layout_constraintTop_toBottomOf="@id/cardStockHeader"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:labelFor="@id/spOrdenCatalogo"
+            android:text="@string/catalogo_ordenar"
+            android:textColor="@color/text_dark"
+            android:textSize="14sp" />
+
+        <Spinner
+            android:id="@+id/spOrdenCatalogo"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:minHeight="48dp"
+            android:layout_marginStart="8dp"
+            android:layout_weight="1"
+            android:entries="@array/catalogo_opciones_orden"
+            android:spinnerMode="dropdown" />
+    </LinearLayout>
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvProductos"
         android:layout_width="0dp"
@@ -89,7 +122,21 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/cardStockHeader"
+        app:layout_constraintTop_toBottomOf="@id/filaOrdenCatalogo"
         tools:listitem="@layout/item_producto" />
 
+    <TextView
+        android:id="@+id/tvCatalogoVacio"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:padding="24dp"
+        android:gravity="center"
+        android:text="@string/catalogo_sin_resultados"
+        android:textColor="@color/text_dark"
+        android:textSize="16sp"
+        android:visibility="gone"
+        android:accessibilityLiveRegion="polite"
+        app:layout_constraintTop_toBottomOf="@id/filaOrdenCatalogo"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>

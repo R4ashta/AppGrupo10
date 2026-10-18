@@ -43,12 +43,21 @@
             android:textColor="@color/gray_text"
             android:textSize="14sp" />
 
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="@string/home_accesos_rapidos"
+            android:textColor="@color/text_dark"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
         <!-- Card Catalogo -->
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/cardHomeCatalogo"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="12dp"
             app:cardBackgroundColor="@color/white"
             app:cardCornerRadius="12dp"
             app:cardElevation="2dp"
@@ -96,7 +105,8 @@
                         android:layout_marginTop="4dp"
                         android:text="@string/desc_home_catalog"
                         android:textColor="@color/gray_text"
-                        android:textSize="13sp" />
+                        android:textSize="14sp"
+                        android:lineSpacingExtra="2dp" />
                 </LinearLayout>
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
@@ -154,7 +164,8 @@
                         android:layout_marginTop="4dp"
                         android:text="@string/desc_home_ventas"
                         android:textColor="@color/gray_text"
-                        android:textSize="13sp" />
+                        android:textSize="14sp"
+                        android:lineSpacingExtra="2dp" />
                 </LinearLayout>
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
@@ -212,7 +223,8 @@
                         android:layout_marginTop="4dp"
                         android:text="@string/desc_home_reservas"
                         android:textColor="@color/gray_text"
-                        android:textSize="13sp" />
+                        android:textSize="14sp"
+                        android:lineSpacingExtra="2dp" />
                 </LinearLayout>
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
@@ -271,7 +283,8 @@
                         android:layout_marginTop="4dp"
                         android:text="@string/desc_home_sync"
                         android:textColor="@color/gray_text"
-                        android:textSize="13sp" />
+                        android:textSize="14sp"
+                        android:lineSpacingExtra="2dp" />
                 </LinearLayout>
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>

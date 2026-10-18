@@ -49,11 +49,18 @@ class CatalogoFragment : Fragment() {
 
         binding.rvProductos.adapter = adapter
 
+        binding.spOrdenCatalogo.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                actualizarCatalogo()
+            }
+            override fun onNothingSelected(parent: AdapterView<*>?) {}
+        }
+
         /* Observar productos */
         val db = UrbanStyleRoomDatabase.getDatabase(requireContext().applicationContext)
         db.productoDao().obtenerTodos().observe(viewLifecycleOwner, Observer { productos ->
             listaProductosActual = productos ?: emptyList()
-            adapter.actualizarLista(listaProductosActual)
+            actualizarCatalogo()
         })
 
         /* Observar stock */
@@ -65,17 +72,7 @@ class CatalogoFragment : Fragment() {
         binding.etBuscarProducto.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                val filtro = s?.toString()?.trim() ?: ""
-                if (filtro.isEmpty()) {
-                    adapter.actualizarLista(listaProductosActual)
-                } else {
-                    val listaFiltrada = listaProductosActual.filter {
-                        it.nombre.contains(filtro, ignoreCase = true) ||
-                        it.color.contains(filtro, ignoreCase = true) ||
-                        it.talla.contains(filtro, ignoreCase = true)
-                    }
-                    adapter.actualizarLista(listaFiltrada)
-                }
+                actualizarCatalogo()
             }
 
             override fun afterTextChanged(s: Editable?) {}
@@ -84,6 +81,26 @@ class CatalogoFragment : Fragment() {
         binding.btnIngresarStock.setOnClickListener {
             mostrarDialogoIngresoStock()
         }
+    }
+
+    private fun actualizarCatalogo() {
+        val filtro = binding.etBuscarProducto.text?.toString()?.trim().orEmpty()
+        val productos = listaProductosActual.filter {
+            filtro.isEmpty() || it.nombre.contains(filtro, ignoreCase = true) ||
+                it.color.contains(filtro, ignoreCase = true) ||
+                it.talla.contains(filtro, ignoreCase = true)
+        }
+        val productosOrdenados = when (binding.spOrdenCatalogo.selectedItemPosition) {
+            1 -> productos.sortedWith(compareBy<ProductoEntity> { it.precio }.thenBy { it.nombre.lowercase(java.util.Locale.ROOT) })
+            2 -> productos.sortedWith(compareByDescending<ProductoEntity> { it.precio }.thenBy { it.nombre.lowercase(java.util.Locale.ROOT) })
+            else -> productos.sortedBy { it.nombre.lowercase(java.util.Locale.ROOT) }
+        }
+        adapter.actualizarLista(productosOrdenados)
+        binding.rvProductos.visibility = if (productos.isEmpty()) View.GONE else View.VISIBLE
+        binding.tvCatalogoVacio.visibility = if (productos.isEmpty()) View.VISIBLE else View.GONE
+        binding.tvCatalogoVacio.setText(
+            if (filtro.isEmpty()) R.string.catalogo_vacio else R.string.catalogo_sin_resultados
+        )
     }
 
     private fun mostrarDialogoIngresoStock() {
