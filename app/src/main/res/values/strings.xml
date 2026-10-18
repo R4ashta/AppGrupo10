@@ -65,4 +65,6 @@
     <string name="text_pendientes_sync">Pendientes de Sincronización: %1$d registros</string>
     <string name="text_sync_exito">Sincronización completada exitosamente con el backend.</string>
     <string name="text_sin_pendientes">No hay ventas ni reservas pendientes de envío.</string>
+
+    <string name="title_registros_locales">Registros Locales (Ventas y Reservas)</string>
 </resources>

@@ -10,6 +10,7 @@
     <color name="urban_green_light">#ECFDF5</color>   <!-- Soft Green Tint -->
     <color name="urban_bg">#F8FAFC</color>            <!-- Light Slate Background -->
     <color name="card_bg">#FFFFFF</color>            <!-- Card Background White -->
+    <color name="urban_primary">#FF9800</color>
 
     <color name="black">#000000</color>
     <color name="white">#FFFFFF</color>

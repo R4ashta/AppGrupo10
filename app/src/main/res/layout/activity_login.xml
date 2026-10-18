@@ -11,12 +11,13 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="24dp">
+        android:paddingHorizontal="28dp"
+        android:paddingVertical="24dp">
 
         <ImageView
             android:id="@+id/imgLogoLogin"
-            android:layout_width="100dp"
-            android:layout_height="100dp"
+            android:layout_width="112dp"
+            android:layout_height="112dp"
             android:contentDescription="@string/app_name"
             android:src="@drawable/logo_urbanstyle"
             app:layout_constraintBottom_toTopOf="@+id/tvTituloLogin"
@@ -29,7 +30,8 @@
             android:id="@+id/tvTituloLogin"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="20dp"
+            android:letterSpacing="0.02"
             android:text="@string/title_login"
             android:textColor="@color/text_dark"
             android:textSize="28sp"
@@ -43,8 +45,10 @@
             android:id="@+id/tvSubtituloLogin"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:layout_marginBottom="28dp"
+            android:layout_marginTop="6dp"
+            android:layout_marginBottom="32dp"
+            android:gravity="center"
+            android:lineSpacingExtra="2dp"
             android:text="@string/subtitle_login"
             android:textColor="@color/gray_text"
             android:textSize="14sp"
@@ -59,9 +63,13 @@
             style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="12dp"
+            android:layout_marginBottom="16dp"
             android:hint="@string/hint_dni_usuario"
             app:boxBackgroundColor="@color/white"
+            app:boxCornerRadiusBottomEnd="12dp"
+            app:boxCornerRadiusBottomStart="12dp"
+            app:boxCornerRadiusTopEnd="12dp"
+            app:boxCornerRadiusTopStart="12dp"
             app:layout_constraintBottom_toTopOf="@+id/tilClave"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -83,6 +91,10 @@
             android:layout_height="wrap_content"
             android:hint="@string/hint_pin_clave"
             app:boxBackgroundColor="@color/white"
+            app:boxCornerRadiusBottomEnd="12dp"
+            app:boxCornerRadiusBottomStart="12dp"
+            app:boxCornerRadiusTopEnd="12dp"
+            app:boxCornerRadiusTopStart="12dp"
             app:endIconMode="password_toggle"
             app:layout_constraintBottom_toTopOf="@+id/tvOlvidasteClave"
             app:layout_constraintEnd_toEndOf="parent"
@@ -102,13 +114,15 @@
             android:id="@+id/tvOlvidasteClave"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="20dp"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="24dp"
             android:clickable="true"
             android:focusable="true"
-            android:padding="4dp"
+            android:gravity="center_vertical"
+            android:minHeight="48dp"
+            android:paddingHorizontal="4dp"
             android:text="@string/text_olvidaste_contrasena"
-            android:textColor="#F83C00"
+            android:textColor="@color/urban_accent"
             android:textSize="13sp"
             android:textStyle="bold"
             app:layout_constraintBottom_toTopOf="@+id/btnIngresar"
@@ -116,22 +130,21 @@
             app:layout_constraintTop_toBottomOf="@+id/tilClave" />
 
         <!-- Botón Iniciar Sesión -->
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/btnIngresar"
             android:layout_width="0dp"
             android:layout_height="56dp"
-            android:backgroundTint="#FF9800"
+            android:backgroundTint="@color/urban_primary"
+            android:elevation="2dp"
+            android:letterSpacing="0.03"
             android:text="@string/btn_ingresar"
             android:textColor="@color/white"
             android:textSize="15sp"
             android:textStyle="bold"
             app:cornerRadius="12dp"
-
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/tvOlvidasteClave" />
-
-
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>
