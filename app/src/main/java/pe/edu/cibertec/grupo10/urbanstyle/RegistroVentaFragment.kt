@@ -1,6 +1,5 @@
 package pe.edu.cibertec.grupo10.urbanstyle
 
-import android.R
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -44,17 +43,19 @@ class RegistroVentaFragment : Fragment() {
 
         db.productoDao().obtenerTodos().observe(viewLifecycleOwner, Observer { productos ->
             listaProductos = productos ?: emptyList()
-            
+
             /* Opción por defecto */
             val nombresProductos = mutableListOf("Selecciona una prenda...")
-            nombresProductos.addAll(listaProductos.map { "${it.nombre} (${it.color} - Talla ${it.talla}) - S/ ${it.precio}" })
-            
+            nombresProductos.addAll(
+                listaProductos.map { "${it.nombre} (${it.color} - Talla ${it.talla}) - S/ ${it.precio}" }
+            )
+
             val spinnerAdapter = ArrayAdapter(
                 requireContext(),
-                R.layout.simple_spinner_item,
+                android.R.layout.simple_spinner_item,
                 nombresProductos
             )
-            spinnerAdapter.setDropDownViewResource(R.layout.simple_spinner_dropdown_item)
+            spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
             binding.spProductos.adapter = spinnerAdapter
         })
 
@@ -90,6 +91,7 @@ class RegistroVentaFragment : Fragment() {
         val cantStr = binding.etCantidad.text.toString().trim()
         val cantidad = cantStr.toIntOrNull() ?: 1
         val total = prod.precio * cantidad
+
         binding.tvTotalPagar.text = String.format(Locale.US, "Total a Pagar: S/ %.2f", total)
     }
 
@@ -133,6 +135,7 @@ class RegistroVentaFragment : Fragment() {
         }
 
         val total = prod.precio * cantidad
+
         val fecha = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault()).format(Date())
         val fechaTicket = SimpleDateFormat("yyMMdd", Locale.getDefault()).format(Date())
         val ticket = "V-$fechaTicket-${(1000..9999).random()}"

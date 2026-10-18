@@ -2,7 +2,9 @@ package pe.edu.cibertec.grupo10.urbanstyle.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
+import pe.edu.cibertec.grupo10.urbanstyle.R
 import pe.edu.cibertec.grupo10.urbanstyle.databinding.ItemProductoBinding
 import pe.edu.cibertec.grupo10.urbanstyle.db.entity.ProductoEntity
 import java.util.Locale
@@ -26,12 +28,21 @@ class ProductoAdapter(
 
     override fun onBindViewHolder(holder: ProductoViewHolder, position: Int) {
         val producto = listaProductos[position]
+        val context = holder.itemView.context
         with(holder.binding) {
             tvNombreProducto.text = producto.nombre
             tvColorProducto.text = "Color: ${producto.color}"
             tvTallaProducto.text = "Talla: ${producto.talla}"
             tvStockProducto.text = "Stock: ${producto.stock} ud."
             tvPrecioProducto.text = String.format(Locale.US, "S/ %.2f", producto.precio)
+
+            /* colores según nivel de stock oño */
+            val colorRes = when {
+                producto.stock >= 25 -> R.color.urban_green
+                producto.stock in 10..24 -> R.color.urban_accent
+                else -> R.color.urban_red
+            }
+            tvStockProducto.setTextColor(ContextCompat.getColor(context, colorRes))
 
             root.setOnClickListener {
                 onItemClick?.invoke(producto)
