@@ -45,7 +45,7 @@ class RegistroVentaFragment : Fragment() {
             listaProductos = productos ?: emptyList()
 
             /* Opción por defecto */
-            val nombresProductos = mutableListOf("Selecciona una prenda...")
+            val nombresProductos = mutableListOf("Seleccionar una prenda...")
             nombresProductos.addAll(
                 listaProductos.map { "${it.nombre} (${it.color} - Talla ${it.talla}) - S/ ${it.precio}" }
             )

@@ -46,7 +46,7 @@ class ReservasFragment : Fragment() {
             listaProductos = productos ?: emptyList()
             
             /* Opción por defecto */
-            val nombresProductos = mutableListOf("Selecciona una prenda...")
+            val nombresProductos = mutableListOf("Seleccionar una prenda...")
             nombresProductos.addAll(listaProductos.map { "${it.nombre} (${it.color} - Talla ${it.talla}) - S/ ${it.precio}" })
             
             val spinnerAdapter = ArrayAdapter(
@@ -65,7 +65,7 @@ class ReservasFragment : Fragment() {
                     calcularTotal()
                 } else {
                     productoSeleccionado = null
-                    binding.tvTotalReserva.text = "Total Reserva: S/ 0.00"
+                    binding.tvTotalReserva.text = "Total de Reserva: S/ 0.00"
                 }
             }
 
@@ -90,7 +90,7 @@ class ReservasFragment : Fragment() {
         val cantStr = binding.etCantidadReserva.text.toString().trim()
         val cantidad = cantStr.toIntOrNull() ?: 1
         val total = prod.precio * cantidad
-        binding.tvTotalReserva.text = String.format(Locale.US, "Total Reserva: S/ %.2f", total)
+        binding.tvTotalReserva.text = String.format(Locale.US, "Total de Reserva: S/ %.2f", total)
     }
 
     private fun registrarReservaOffline() {

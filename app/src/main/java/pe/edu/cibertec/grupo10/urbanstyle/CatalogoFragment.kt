@@ -146,7 +146,7 @@ class CatalogoFragment : Fragment() {
                     val cantidad = cantStr.toIntOrNull() ?: 0
 
                     if (prod == null) {
-                        Toast.makeText(requireContext(), "Seleccione una prenda", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(requireContext(), "Seleccionar una prenda", Toast.LENGTH_SHORT).show()
                         return@setOnClickListener
                     }
 
